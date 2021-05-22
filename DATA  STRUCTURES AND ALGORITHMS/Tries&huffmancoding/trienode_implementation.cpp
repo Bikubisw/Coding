@@ -1,109 +1,148 @@
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <vector>
+#include <map>
+#include <climits>
+#include <cfloat>
+#include <unordered_set>
+#include <unordered_map>
+#include <string>
+#include <cstring>
+#include <stack>
+#include <queue>
+#include <cmath>
+#include <algorithm>
+#include <iterator>
+#include <cstdlib>
+#include <cassert>
+#include <utility>
+#include <unordered_set>
+#include <set>
+#include <cmath>
 using namespace std;
-class Trienode{
+typedef long long int ll;
+typedef unsigned long long int ull;
+typedef pair<int,pair<int,int>> ppi;
+typedef pair<int,int> pi;
+#define MOD 1000000007
+#define PINF LLONG_MAX
+#define NINF LLONG_MIN
+#define endl '\n'
+#define IOS ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
+class TrieNode{
 	public:
 		char data;
-		Trienode** children;
+		TrieNode** children;
 		bool isterminal;
-		Trienode(char data){
+		TrieNode(char data){
 			this->data=data;
-			children=new Trienode*[26];
+			isterminal=false;
+			children=new TrieNode*[26];
 			for(int i=0;i<26;i++){
-				children[i]=NULL;
+				 children[i]=NULL;
 			}
-			isterminal=false;	
-		}	
+		}
+		~TrieNode(){
+			 for(int i=0;i<26;i++){
+				  delete children[i];
+			 }
+			 delete[] children;
+		}
 };
-class Trie{ 
-		Trienode *root;
+class Trie{
+		TrieNode* root;
 		public:
-			Trie(){
-				root=new Trienode('\0');
-			}
-			// inserting elements in our tries//
-			void insertWord_(Trienode* root,string word){
-			if(word.size()==0){
+		 Trie(){
+			root=new TrieNode('\0');
+		 }
+		 private:
+		 void insertword(TrieNode* root,string s){
+			if((int)s.length()==0){
 				root->isterminal=true;
-				return;
+				return ;
 			}
-			int index=word[0]-'a';
-			Trienode*child;
+			int index=s[0]-'a';
+			TrieNode *child;
 			if(root->children[index]!=NULL){
 				child=root->children[index];
-			}
-			else{
-				child=new Trienode(word[0]);
+			}else{
+				child=new TrieNode(s[0]);
 				root->children[index]=child;
 			}
-			insertWord_(child,word.substr(1));
-		}
-		void insertWord(string word)
-			{
-			insertWord_(root,word); 	
+			insertword(child,s.substr(1));
+		 }
+		 public:
+		 void insertword(string s){
+			insertword(root,s); 
+		 }
+		 private:
+		 bool searchword(TrieNode *root,string s){
+			 if((int)s.length()==0){
+				 if(root->isterminal==true){
+					 return true;
+				 }
+				 return false;
+			 }
+			 int index=s[0]-'a';
+			 TrieNode* child;
+			 if(root->children[index]!=NULL){
+				 child=root->children[index];
+			 }
+			 else {
+				 return false;
+			 }
+			 bool ans=searchword(child,s.substr(1));
+			 return ans;
+		 }
+		 public:
+			bool searchword(string s){
+				return searchword(root,s);
 			}
-		// searching elements in our tries
-		bool searchword(Trienode*root,string word){
-				if(word.size()==0){
-					if(root->isterminal==true){
-						return true;
-					}
-					else{
-						return false;
-					}
-				}
-				int index=word[0]-'a';
-				Trienode* child;
+			private:
+				void removeword(TrieNode* root,string s){
+				if((int)s.length()==0){
+					root->isterminal=false;
+					return;
+				}	
+				TrieNode *child;
+				int index=s[0]-'a';
 				if(root->children[index]!=NULL){
 					child=root->children[index];
 				}
 				else{
-					return false;
+					return;
 				}
-				bool ans=searchword(child,word.substr(1));
-				return ans;
-		}
-		
-    	bool search(string word) {
-         return searchword(root,word);
-    }
-    // removing elements from our tries
-    	void removeword_(Trienode* root,string word){
-    		if(word.size()==0){
-    			root->isterminal=false;
-    			return;
-			}	
-			Trienode*child;
-			int index=word[0]-'a';
-			if(root->children[index]!=NULL){
-				child=root->children[index];	
-			}
-			else{
-				return; 
-			}
-			removeword_(child,word.substr(1));
-		// remove child node if it is uselesss
-			if(child->isterminal==false){
-				for(int i=0;i<26;i++){
-					if(child->children[i]!=NULL){
-						return;
+				removeword(child,s.substr(1));
+				if(child->isterminal==false){
+					for(int i=0;i<26;i++){
+						if(child->children[index]!=NULL){
+							return;
+						}
 					}
-				}
-				delete child;
-				root->children[index]=NULL;
-			}
-		}
-    	void removeword(string word){
-    	removeword_(root,word);
-	}
+					delete child;
+					root->children[index]=NULL;
+				}	
+				}	
+			public:
+				void removeword(string s){
+					removeword(root,s);
+				}	 
 };
-int main(){
-	Trie t;
-	t.insertWord("and");
-	t.insertWord("are");
-	t.insertWord("not");
-	cout<<t.search("and")<<endl;
-	t.removeword("and");
-	cout<<t.search("and")<<endl;
-	return 0;
+int main()
+{
+    IOS;
+    Trie t;
+    t.insertword("abc");
+    t.insertword("are");
+    t.insertword("not");
+    if(t.searchword("abc")){cout<<"present"<<endl;}
+    else {
+		cout<<"not present"<<endl;
+    }
+    t.removeword("abc");
+    
+    if(t.searchword("abc")){cout<<"present"<<endl;}
+    else {
+		cout<<"not present"<<endl;
+    }
+    return 0;
 }
