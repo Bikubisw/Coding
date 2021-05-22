@@ -54,7 +54,7 @@ class Trie{
 				}
 				int index=word[0]-'a';
 				Trienode* child;
-				if(child!=NULL){
+				if(root->children[index]!=NULL){
 					child=root->children[index];
 				}
 				else{
